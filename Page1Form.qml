@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
+import com.chewnonobelix.gw2 1.0
 
 Page {
     id: page
@@ -9,34 +10,35 @@ Page {
 
     title: qsTr("Trainer")
 
-    GWRotationHandler {
+    GW2RotationHandler {
         id: handler
+
+        mapping: [
+            { "role":"1", "key": "&"},
+            { "role":"2", "key": "é"},
+            { "role":"3", "key": "\""},
+            { "role":"4", "key": "'"},
+            { "role":"5", "key": "("},
+            { "role":"6", "key": "-"},
+            { "role":"7", "key": "è"},
+            { "role":"8", "key": "_"},
+            { "role":"9", "key": "ç"},
+            { "role":"0", "key": "à"},
+            { "role":"swap", "key": "²"},
+            { "role":"roll", "key": "c"},
+            { "role":"F1", "key": "F1"},
+            { "role":"F2", "key": "F2"},
+            { "role":"F3", "key": "F3"},
+            { "role":"F4", "key": "F4"},
+            { "role":"F5", "key": "F5"}
+        ]
     }
 
     Component.onCompleted: {
-        load()
+        handler.load("D:/power_catalyst.json")
+//        handler.randomKey()
         console.log(handler)
     }
-
-    function load() {
-        var request = new XMLHttpRequest()
-        request.open('GET', 'file:///C:/Users/duham/Documents/build-gw2rotation-Desktop_Qt_6_3_0_MinGW_64_bit-Debug/power_catalyst.json')
-        request.onreadystatechange = function(event) {
-            if (request.readyState === XMLHttpRequest.DONE) {
-                handler.rotation = JSON.parse(request.responseText.toString())
-            }
-            handler.currentDisplay = Qt.binding(function() {
-                return handler.keyFromRole(handler.currentRole)
-            })
-
-            handler.currentRole = Qt.binding(function() {
-                return handler.isOpening ? handler.rotation.opening[handler.currentOpening]["role"] : handler.rotation.rotation[handler.currentRot]["role"]
-            })
-        }
-        request.send()
-
-    }
-
 
     Label {
         id: display
@@ -274,6 +276,5 @@ Page {
                 handler.validate("F5")
             }
         }
-
     }
 }

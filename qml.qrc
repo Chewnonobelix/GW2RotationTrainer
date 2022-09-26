@@ -5,6 +5,5 @@
         <file>Page1Form.qml</file>
         <file>Page2Form.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>GWRotationHandler.qml</file>
     </qresource>
 </RCC>
