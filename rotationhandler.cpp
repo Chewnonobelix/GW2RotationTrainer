@@ -43,10 +43,11 @@ void RotationHandler::validate(QString key)
 
 void RotationHandler::next()
 {
-    m_isOpening = m_currentOpening < m_rotation["opening"].toArray().count();
     m_isOpening ? m_currentOpening++ : (m_currentRot = (m_currentRot+1)%m_rotation["rotation"].toArray().count());
+    m_isOpening = m_currentOpening < m_rotation["opening"].toArray().count();
     setting();
     m_total++;
+    emit totalChanged();
 }
 
 void RotationHandler::randomKey()
@@ -149,7 +150,6 @@ void RotationHandler::setting()
 
     emit currentDisplayChanged();
     emit currentRoleChanged();
-    emit totalChanged();
 }
 
 void RotationHandler::setRotation(QJsonObject rot)
