@@ -1,11 +1,19 @@
 #include "rotationhandler.h"
 #include <QDebug>
 #include <QFile>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+
 
 RotationHandler::RotationHandler(QObject *parent)
     : QObject{parent}
 {
-
+    connect(&m_network, &QNetworkAccessManager::finished, [this](auto reply) {
+        auto json = QJsonDocument::fromJson(reply->readAll()).array();
+        qDebug()<<json<<json[0].toObject()["icon"]<<json[0].toObject()["icon"].toString()<<QUrl(json[0].toObject()["icon"].toString());
+        m_icon = QUrl(json[0].toObject()["icon"].toString());
+    } );
+    m_network.get(QNetworkRequest(QUrl("https://api.guildwars2.com/v2/skills?ids=21762")));
 }
 
 int RotationHandler::indexFromKey(QString key)
@@ -162,4 +170,10 @@ void RotationHandler::append(QString key, QJsonObject map)
     auto array = m_rotation[key].toArray();
     array.append(map);
     m_rotation[key] = array;
+}
+
+QUrl RotationHandler::icon() const
+{
+    qDebug()<<m_icon;
+    return m_icon;
 }

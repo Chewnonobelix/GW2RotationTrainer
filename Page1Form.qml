@@ -77,14 +77,17 @@ Page {
         Button {
             id: button1
             text: "1"
+            icon.source: handler.icon()
             Shortcut {
                 sequence: "&"
                 onActivated: button1.clicked()
             }
 
             onClicked: {
+                console.log(handler.icon())
                 handler.validate("&")
             }
+            display: AbstractButton.IconOnly
         }
         Button {
             id: button2

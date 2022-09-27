@@ -5,6 +5,7 @@
 #include <QJsonDocument>
 #include <QFile>
 #include <QRandomGenerator>
+#include <QNetworkAccessManager>
 
 class RotationHandler : public QObject
 {
@@ -28,6 +29,7 @@ public:
     Q_INVOKABLE void randomKey();
     Q_INVOKABLE void save(QUrl);
     Q_INVOKABLE void load(QUrl);
+    Q_INVOKABLE QUrl icon() const;
 
     QJsonObject rotation() const;
     QJsonArray mapping() const;
@@ -64,5 +66,7 @@ private:
     bool m_isOpening = false;
 
     void setting();
+    QUrl m_icon;
+    QNetworkAccessManager m_network;
 };
 
