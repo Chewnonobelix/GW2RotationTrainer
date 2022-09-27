@@ -8,7 +8,7 @@ Page {
     width: 600
     height: 400
 
-    title: qsTr("Page 2")
+    title: qsTr("Register rotation")
     GW2RotationHandler {
         id: handler
 

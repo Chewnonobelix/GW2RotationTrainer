@@ -55,7 +55,6 @@ Page {
     Label {
         id: display
         Component.onCompleted:{
-            //            handler.randomKey()
         }
         anchors.left: parent.left
         anchors.top: parent.top
