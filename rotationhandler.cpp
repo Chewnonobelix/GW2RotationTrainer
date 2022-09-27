@@ -105,21 +105,20 @@ void RotationHandler::setMapping(QJsonArray mapping)
     qDebug()<<m_mapping;
 }
 
-void RotationHandler::save(QString fileName)
+void RotationHandler::save(QUrl url)
 {
-    auto array = m_rotation["rotation"].toArray();
-    qDebug()<<"Save"<<array;
-    QJsonObject obj;
-    obj["rotation"] = array;
-    QJsonDocument doc(obj);
+    auto fileName = url.path().remove(0,1);
+    QJsonDocument doc(m_rotation);
     QFile file(fileName);
     file.open(QIODevice::WriteOnly);
     file.write(doc.toJson());
     file.close();
 }
 
-void RotationHandler::load(QString fileName)
+void RotationHandler::load(QUrl url)
 {
+    auto fileName = url.path().remove(0, 1);
+
     QFile file(fileName);
     file.open(QIODevice::ReadOnly);
     auto json = file.readAll();

@@ -1,6 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.12
+import QtQuick.Dialogs
+
 import com.chewnonobelix.gw2 1.0
 
 Page {
@@ -35,14 +37,19 @@ Page {
     }
 
     Component.onCompleted: {
-        handler.load("D:/power_catalyst.json")
-//        handler.randomKey()
-        console.log(handler)
+    }
+
+    FileDialog {
+        id: loader
+        nameFilters: ["JSON Files (*.json)"]
+        fileMode: FileDialog.OpenFile
+
+        onAccepted: handler.load(selectedFile)
     }
 
     Button{
         text: "Load"
-        onClicked: handler.load("d:/wesh.json")
+        onClicked: loader.open()
     }
 
     Label {

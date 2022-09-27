@@ -26,8 +26,8 @@ public:
     Q_INVOKABLE void validate(QString key);
     Q_INVOKABLE void next();
     Q_INVOKABLE void randomKey();
-    Q_INVOKABLE void save(QString);
-    Q_INVOKABLE void load(QString);
+    Q_INVOKABLE void save(QUrl);
+    Q_INVOKABLE void load(QUrl);
 
     QJsonObject rotation() const;
     QJsonArray mapping() const;

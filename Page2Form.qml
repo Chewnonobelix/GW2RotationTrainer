@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Dialogs
 import com.chewnonobelix.gw2 1.0
 
 Page {
@@ -34,17 +35,19 @@ Page {
     }
 
     property var registerList: []
-    function saveFile(fileUrl, text) {
-        var request = new XMLHttpRequest();
-        request.open("PUT", fileUrl, false);
-        request.send(text);
-        return request.status;
+
+    FileDialog {
+        id: saver
+        nameFilters: ["JSON Files (*.json)"]
+        fileMode: FileDialog.SaveFile
+
+        onAccepted: handler.save(selectedFile)
     }
 
     function onPushed(key) {
         var obj = {}
         obj.role = handler.mapping[handler.indexFromKey(key)].role
-        handler.append("rotation", obj)
+        handler.append(switcher.text, obj)
     }
 
     Shortcut {
@@ -74,7 +77,16 @@ Page {
     }
 
     Button {
+        id: save
         text: "Save"
-        onClicked: handler.save("d:/wesh.json")
+        onClicked:saver.open()
+    }
+
+    Switch {
+        id: switcher
+        text: checked ? "opening" : "rotation"
+        anchors {
+            left: save.right
+        }
     }
 }
