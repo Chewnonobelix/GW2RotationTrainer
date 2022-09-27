@@ -105,8 +105,10 @@ void RotationHandler::setMapping(QJsonArray mapping)
     qDebug()<<m_mapping;
 }
 
-void RotationHandler::save(QString fileName, QJsonArray array)
+void RotationHandler::save(QString fileName)
 {
+    auto array = m_rotation["rotation"].toArray();
+    qDebug()<<"Save"<<array;
     QJsonObject obj;
     obj["rotation"] = array;
     QJsonDocument doc(obj);
@@ -149,4 +151,16 @@ void RotationHandler::setting()
     emit currentDisplayChanged();
     emit currentRoleChanged();
     emit totalChanged();
+}
+
+void RotationHandler::setRotation(QJsonObject rot)
+{
+    m_rotation = rot;
+}
+
+void RotationHandler::append(QString key, QJsonObject map)
+{
+    auto array = m_rotation[key].toArray();
+    array.append(map);
+    m_rotation[key] = array;
 }

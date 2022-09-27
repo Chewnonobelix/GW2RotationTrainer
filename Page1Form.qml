@@ -40,6 +40,11 @@ Page {
         console.log(handler)
     }
 
+    Button{
+        text: "Load"
+        onClicked: handler.load("d:/wesh.json")
+    }
+
     Label {
         id: display
         Component.onCompleted:{

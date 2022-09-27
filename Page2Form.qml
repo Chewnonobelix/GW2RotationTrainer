@@ -10,6 +10,8 @@ Page {
     title: qsTr("Page 2")
     GW2RotationHandler {
         id: handler
+
+        rotation: {"opening": [], "rotation": []}
         mapping: [
             { "role":"1", "key": "&"},
             { "role":"2", "key": "é"},
@@ -40,12 +42,9 @@ Page {
     }
 
     function onPushed(key) {
-        console.log(registerList.length, handler.indexFromKey(key), handler.mapping[handler.indexFromKey(key)].role, handler.mapping[handler.indexFromKey(key)].key)
         var obj = {}
         obj.role = handler.mapping[handler.indexFromKey(key)].role
-        registerList[registerList.length] = obj
-        console.log(registerList, registerList.length, JSON.stringify(registerList))
-        handler.save('D:/bouya.json', registerList)
+        handler.append("rotation", obj)
     }
 
     Shortcut {
@@ -72,5 +71,10 @@ Page {
         sequence: "("
 
         onActivated: onPushed(sequence)
+    }
+
+    Button {
+        text: "Save"
+        onClicked: handler.save("d:/wesh.json")
     }
 }

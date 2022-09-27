@@ -9,7 +9,7 @@
 class RotationHandler : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QJsonObject rotation READ rotation NOTIFY rotationChanged)
+    Q_PROPERTY(QJsonObject rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
     Q_PROPERTY(QJsonArray mapping READ mapping WRITE setMapping NOTIFY mappingChanged)
 
     Q_PROPERTY(int total READ total NOTIFY totalChanged)
@@ -26,7 +26,7 @@ public:
     Q_INVOKABLE void validate(QString key);
     Q_INVOKABLE void next();
     Q_INVOKABLE void randomKey();
-    Q_INVOKABLE void save(QString, QJsonArray);
+    Q_INVOKABLE void save(QString);
     Q_INVOKABLE void load(QString);
 
     QJsonObject rotation() const;
@@ -38,6 +38,8 @@ public:
     QString color() const;
 
     void setMapping(QJsonArray);
+    void setRotation(QJsonObject);
+    Q_INVOKABLE void append(QString, QJsonObject);
 
 signals:
     void rotationChanged();
