@@ -76,6 +76,42 @@ Page {
         onActivated: onPushed(sequence)
     }
 
+    Shortcut {
+        sequence: "-"
+
+        onActivated: onPushed(sequence)
+    }
+    Shortcut {
+        sequence: "è"
+
+        onActivated: onPushed(sequence)
+    }
+    Shortcut {
+        sequence: "_"
+
+        onActivated: onPushed(sequence)
+    }
+    Shortcut {
+        sequence: "ç"
+
+        onActivated: onPushed(sequence)
+    }
+    Shortcut {
+        sequence: "à"
+
+        onActivated: onPushed(sequence)
+    }
+    Shortcut {
+        sequence: "c"
+
+        onActivated: onPushed(sequence)
+    }
+    Shortcut {
+        sequence: "²"
+
+        onActivated: onPushed(sequence)
+    }
+
     Button {
         id: save
         text: "Save"
@@ -88,5 +124,15 @@ Page {
         anchors {
             left: save.right
         }
+    }
+
+    Button {
+        id: clear
+        text: "Clear"
+        onClicked: handler.rotation = {"opening": [], "rotation": []}
+        anchors {
+            top: save.bottom
+        }
+
     }
 }
