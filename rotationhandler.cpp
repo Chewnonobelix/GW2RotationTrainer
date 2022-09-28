@@ -8,12 +8,7 @@
 RotationHandler::RotationHandler(QObject *parent)
     : QObject{parent}
 {
-    connect(&m_network, &QNetworkAccessManager::finished, [this](auto reply) {
-        auto json = QJsonDocument::fromJson(reply->readAll()).array();
-        qDebug()<<json<<json[0].toObject()["icon"]<<json[0].toObject()["icon"].toString()<<QUrl(json[0].toObject()["icon"].toString());
-        m_icon = QUrl(json[0].toObject()["icon"].toString());
-    } );
-    m_network.get(QNetworkRequest(QUrl("https://api.guildwars2.com/v2/skills?ids=21762")));
+    m_mapping = m_db.mapping();
 }
 
 int RotationHandler::indexFromKey(QString key)
@@ -114,32 +109,35 @@ void RotationHandler::setMapping(QJsonArray mapping)
     qDebug()<<m_mapping;
 }
 
-void RotationHandler::save(QUrl url)
+void RotationHandler::save(QString name)
 {
-    auto fileName = url.path().remove(0,1);
-    QJsonDocument doc(m_rotation);
-    QFile file(fileName);
-    file.open(QIODevice::WriteOnly);
-    file.write(doc.toJson());
-    file.close();
+    m_rotation["name"] = name;
+    m_db.addBuild(m_rotation);
+//    auto fileName = url.path().remove(0,1);
+//    QJsonDocument doc(m_rotation);
+//    QFile file(fileName);
+//    file.open(QIODevice::WriteOnly);
+//    file.write(doc.toJson());
+//    file.close();
 }
 
-void RotationHandler::load(QUrl url)
+void RotationHandler::load(/*QUrl url*/)
 {
-    auto fileName = url.path().remove(0, 1);
+    qDebug()<<m_db.builds();
+//    auto fileName = url.path().remove(0, 1);
 
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
-    auto json = file.readAll();
-    file.close();
+//    QFile file(fileName);
+//    file.open(QIODevice::ReadOnly);
+//    auto json = file.readAll();
+//    file.close();
 
-    m_currentRot = 0;
-    m_currentOpening = 0;
-    m_rotation = QJsonDocument::fromJson(json).object();
+//    m_currentRot = 0;
+//    m_currentOpening = 0;
+//    m_rotation = QJsonDocument::fromJson(json).object();
 
-    emit rotationChanged();
-    qDebug()<<m_rotation;
-    setting();
+//    emit rotationChanged();
+//    qDebug()<<m_rotation;
+//    setting();
 }
 
 void RotationHandler::setting()
@@ -170,10 +168,4 @@ void RotationHandler::append(QString key, QJsonObject map)
     auto array = m_rotation[key].toArray();
     array.append(map);
     m_rotation[key] = array;
-}
-
-QUrl RotationHandler::icon() const
-{
-    qDebug()<<m_icon;
-    return m_icon;
 }

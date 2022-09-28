@@ -7,6 +7,8 @@
 #include <QRandomGenerator>
 #include <QNetworkAccessManager>
 
+#include "database.h"
+
 class RotationHandler : public QObject
 {
     Q_OBJECT
@@ -27,9 +29,8 @@ public:
     Q_INVOKABLE void validate(QString key);
     Q_INVOKABLE void next();
     Q_INVOKABLE void randomKey();
-    Q_INVOKABLE void save(QUrl);
-    Q_INVOKABLE void load(QUrl);
-    Q_INVOKABLE QUrl icon() const;
+    Q_INVOKABLE void save(QString);
+    Q_INVOKABLE void load();
 
     QJsonObject rotation() const;
     QJsonArray mapping() const;
@@ -65,8 +66,7 @@ private:
     int m_currentOpening = 0;
     bool m_isOpening = false;
 
+    DataBase m_db;
     void setting();
-    QUrl m_icon;
-    QNetworkAccessManager m_network;
 };
 

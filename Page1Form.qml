@@ -14,42 +14,22 @@ Page {
 
     GW2RotationHandler {
         id: handler
-
-        mapping: [
-            { "role":"1", "key": "&"},
-            { "role":"2", "key": "é"},
-            { "role":"3", "key": "\""},
-            { "role":"4", "key": "'"},
-            { "role":"5", "key": "("},
-            { "role":"6", "key": "-"},
-            { "role":"7", "key": "è"},
-            { "role":"8", "key": "_"},
-            { "role":"9", "key": "ç"},
-            { "role":"0", "key": "à"},
-            { "role":"swap", "key": "²"},
-            { "role":"roll", "key": "c"},
-            { "role":"F1", "key": "F1"},
-            { "role":"F2", "key": "F2"},
-            { "role":"F3", "key": "F3"},
-            { "role":"F4", "key": "F4"},
-            { "role":"F5", "key": "F5"}
-        ]
     }
 
     Component.onCompleted: {
     }
 
-    FileDialog {
-        id: loader
-        nameFilters: ["JSON Files (*.json)"]
-        fileMode: FileDialog.OpenFile
+//    FileDialog {
+//        id: loader
+//        nameFilters: ["JSON Files (*.json)"]
+//        fileMode: FileDialog.OpenFile
 
-        onAccepted: handler.load(selectedFile)
-    }
+//        onAccepted: handler.load(selectedFile)
+//    }
 
     Button{
         text: "Load"
-        onClicked: loader.open()
+        onClicked: handler.load()
     }
 
     Label {
@@ -77,17 +57,15 @@ Page {
         Button {
             id: button1
             text: "1"
-            icon.source: handler.icon()
+
             Shortcut {
-                sequence: "&"
+                sequences: ["&", "a"]
                 onActivated: button1.clicked()
             }
 
             onClicked: {
-                console.log(handler.icon())
                 handler.validate("&")
             }
-            display: AbstractButton.IconOnly
         }
         Button {
             id: button2
