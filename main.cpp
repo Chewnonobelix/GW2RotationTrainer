@@ -2,6 +2,8 @@
 #include <QQmlApplicationEngine>
 
 #include "rotationhandler.h"
+#include "dataprovider.h"
+
 //#include "buildeditor.h"
 
 int main(int argc, char *argv[])
@@ -13,6 +15,18 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     qmlRegisterType<RotationHandler>("com.chewnonobelix.gw2", 1, 0, "GW2RotationHandler");
 //    qmlRegisterType<BuildEditorData>("com.chewnonobelix.gw2", 1, 0, "GW2BuildEditor");
+
+    DataProvider dp;
+    QObject::connect(&dp, &DataProvider::dataObjectReady, [] (auto obj) {
+       qDebug()<<obj;
+       QFile f("test.json");
+       f.open(QIODevice::WriteOnly);
+       QJsonDocument doc(obj);
+       f.write(doc.toJson());
+       f.close();
+    });
+    dp.request("https://api.guildwars2.com/v2/professions/Engineer");
+
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
