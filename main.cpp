@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 
 #include "rotationhandler.h"
+//#include "buildeditor.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +12,7 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
     qmlRegisterType<RotationHandler>("com.chewnonobelix.gw2", 1, 0, "GW2RotationHandler");
+//    qmlRegisterType<BuildEditorData>("com.chewnonobelix.gw2", 1, 0, "GW2BuildEditor");
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

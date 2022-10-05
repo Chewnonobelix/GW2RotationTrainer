@@ -14,31 +14,62 @@ DataBase::DataBase(QObject *parent)
 QJsonArray DataBase::mapping() const
 {
     QJsonArray ret;
-    auto query = m_db.exec("SELECT role, key FROM mapping");
+    auto query = m_db.exec("SELECT role, key, id FROM mapping");
 
     while(query.next()) {
         auto record = query.record();
         QJsonObject obj;
         obj["role"] = record.value("role").toString();
         obj["key"] = record.value("key").toString();
+        obj["id"] = record.value("id").toInt();
+
         ret<<obj;
     }
     return ret;
 }
 
-QJsonObject DataBase::build(int) const
+QJsonObject DataBase::build(int id) const
 {
-    return QJsonObject();
+    auto buildQuery = m_db.exec(QString("SELECT name FROM builds WHERE id='%1'").arg(id));
+
+    buildQuery.next();
+    auto record = buildQuery.record();
+    QJsonObject ret;
+    ret["name"] = record.value("name").toString();
+    auto rotationQuery = m_db.exec(QString("SELECT 'index', opening, role FROM rotation WHERE build='%1' ORDER BY opening, 'index'").arg(id));
+    auto map = mapping();
+
+    QJsonArray opening, rotation;
+    while (rotationQuery.next())
+    {
+        auto recordRotation = rotationQuery.record();
+        auto roleId = recordRotation.value("role").toInt();
+        auto it = std::find_if(map.begin(), map.end(), [roleId](auto obj) {
+            return obj.toObject()["id"].toInt() == roleId;
+        });
+
+        QJsonObject obj;
+        obj["role"] = it->toObject()["role"].toString();
+
+        (recordRotation.value("opening").toBool() ? opening : rotation) << obj;
+    }
+
+    ret["opening"] = opening;
+    ret["rotation"] = rotation;
+    return ret;
 }
 
-QStringList DataBase::builds() const
+QJsonArray DataBase::builds() const
 {
-    QStringList ret;
+    QJsonArray ret;
 
-    auto query = m_db.exec("SELECT name FROM builds");
+    auto query = m_db.exec("SELECT name, id FROM builds ORDER BY name");
     while(query.next()) {
         auto record = query.record();
-        ret<<record.value("name").toString();
+        QJsonObject obj;
+        obj["name"] = record.value("name").toString();
+        obj["id"] = record.value("id").toInt();
+        ret<<obj;
     }
 
     return ret;
@@ -46,10 +77,8 @@ QStringList DataBase::builds() const
 
 void DataBase::addBuild(QJsonObject build)
 {
-    qDebug()<<build;
     auto query = m_db.exec(QString("INSERT INTO builds (name) VALUES('%1')").arg(build["name"].toString()));
     auto id = query.lastInsertId();
-    qDebug()<<"Insert build"<<query.lastError()<<id;
 
     auto opening = build["opening"].toArray();
     auto rotation = build["rotation"].toArray();
@@ -61,8 +90,6 @@ void DataBase::addBuild(QJsonObject build)
             auto role = queryRole.record().value("id").toInt();
             auto queryRot = m_db.exec(QString("INSERT INTO rotation (build, role, opening, 'index') VALUES ('%1', '%2', '%3', '%4')")
                                       .arg(id.toInt()).arg(role).arg(isOpening).arg(i));
-
-            qDebug()<<"Rot insert"<<queryRot.lastQuery()<<queryRot.lastError();
         }
     };
 

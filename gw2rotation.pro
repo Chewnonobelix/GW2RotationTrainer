@@ -8,7 +8,9 @@ CONFIG += c++20
 
 SOURCES += \
         database.cpp \
+        dataprovider.cpp \
         main.cpp \
+        profession.cpp \
         rotationhandler.cpp
 
 RESOURCES += qml.qrc
@@ -27,4 +29,6 @@ QML_XHR_ALLOW_FILE_READ = 1
 
 HEADERS += \
     database.h \
+    dataprovider.h \
+    profession.h \
     rotationhandler.h

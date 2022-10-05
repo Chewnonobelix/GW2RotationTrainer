@@ -30,7 +30,8 @@ public:
     Q_INVOKABLE void next();
     Q_INVOKABLE void randomKey();
     Q_INVOKABLE void save(QString);
-    Q_INVOKABLE void load();
+    Q_INVOKABLE void load(int);
+    Q_INVOKABLE QJsonArray buildsList() const;
 
     QJsonObject rotation() const;
     QJsonArray mapping() const;

@@ -13,20 +13,20 @@ RotationHandler::RotationHandler(QObject *parent)
 
 int RotationHandler::indexFromKey(QString key)
 {
-    for(auto i = 0; i < 17; i++) {
-        if(m_mapping[i].toObject()["key"].toString() == key) {
-            return i;
-        }
-    }
+    auto it = std::find_if(m_mapping.begin(), m_mapping.end(), [key](auto it) {
+       return it.toObject()["key"].toString() == key;
+    });
+
+    return std::distance(m_mapping.begin(), it);
 }
 
 QString RotationHandler::keyFromRole(QString role)
 {
-    for(auto i = 0; i < 17; i++) {
-        if(m_mapping[i].toObject()["role"].toString() == role) {
-            return m_mapping[i].toObject()["key"].toString();
-        }
-    }
+    auto it = std::find_if(m_mapping.begin(), m_mapping.end(), [role](auto it) {
+       return it.toObject()["role"].toString() == role;
+    });
+
+    return it->toObject()["key"].toString();
 }
 
 void RotationHandler::validate(QString key)
@@ -106,38 +106,25 @@ void RotationHandler::setMapping(QJsonArray mapping)
 {
     m_mapping = mapping;
     emit mappingChanged();
-    qDebug()<<m_mapping;
 }
 
 void RotationHandler::save(QString name)
 {
     m_rotation["name"] = name;
     m_db.addBuild(m_rotation);
-//    auto fileName = url.path().remove(0,1);
-//    QJsonDocument doc(m_rotation);
-//    QFile file(fileName);
-//    file.open(QIODevice::WriteOnly);
-//    file.write(doc.toJson());
-//    file.close();
 }
 
-void RotationHandler::load(/*QUrl url*/)
+void RotationHandler::load(int id)
 {
-    qDebug()<<m_db.builds();
-//    auto fileName = url.path().remove(0, 1);
+    auto obj = m_db.build(id);
+    m_rotation = obj;
 
-//    QFile file(fileName);
-//    file.open(QIODevice::ReadOnly);
-//    auto json = file.readAll();
-//    file.close();
+    m_currentRot = 0;
+    m_currentOpening = 0;
 
-//    m_currentRot = 0;
-//    m_currentOpening = 0;
-//    m_rotation = QJsonDocument::fromJson(json).object();
+    emit rotationChanged();
 
-//    emit rotationChanged();
-//    qDebug()<<m_rotation;
-//    setting();
+    setting();
 }
 
 void RotationHandler::setting()
@@ -168,4 +155,9 @@ void RotationHandler::append(QString key, QJsonObject map)
     auto array = m_rotation[key].toArray();
     array.append(map);
     m_rotation[key] = array;
+}
+
+QJsonArray RotationHandler::buildsList() const
+{
+    return m_db.builds();
 }

@@ -42,7 +42,7 @@ ApplicationWindow {
                 text: qsTr("Trainer")
                 width: parent.width
                 onClicked: {
-                    stackView.push("Page1Form.qml")
+                    stackView.push("RotationTrainer.qml")
                     drawer.close()
                 }
             }
@@ -50,7 +50,15 @@ ApplicationWindow {
                 text: qsTr("Register")
                 width: parent.width
                 onClicked: {
-                    stackView.push("Page2Form.qml")
+                    stackView.push("RotationRegister.qml")
+                    drawer.close()
+                }
+            }
+            ItemDelegate {
+                text: qsTr("Editor")
+                width: parent.width
+                onClicked: {
+                    stackView.push("BuildEditor.qml", {"width": stackView.width})
                     drawer.close()
                 }
             }

@@ -2,8 +2,11 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>HomeForm.qml</file>
-        <file>Page1Form.qml</file>
-        <file>Page2Form.qml</file>
+        <file>RotationTrainer.qml</file>
+        <file>RotationRegister.qml</file>
         <file>qtquickcontrols2.conf</file>
+        <file>BuildEditor.qml</file>
+        <file>SkillBar.qml</file>
+        <file>TraitBar.qml</file>
     </qresource>
 </RCC>

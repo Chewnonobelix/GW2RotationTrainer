@@ -18,7 +18,7 @@ public:
 
     QJsonArray mapping() const;
     QJsonObject build(int) const;
-    QStringList builds() const;
+    QJsonArray builds() const;
     void addBuild(QJsonObject);
 
 signals:
