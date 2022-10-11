@@ -8,5 +8,7 @@
         <file>BuildEditor.qml</file>
         <file>SkillBar.qml</file>
         <file>TraitBar.qml</file>
+        <file>SkillGrid.qml</file>
+        <file>SkillButton.qml</file>
     </qresource>
 </RCC>

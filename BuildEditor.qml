@@ -25,7 +25,7 @@ Page {
     }
 
     ScrollView {
-        Grid {
+        GridLayout {
             anchors.fill: parent
             columns: 5
             Label {
@@ -37,19 +37,45 @@ Page {
                 onCurrentTextChanged: prof.setName(currentText)
             }
 
+            SkillButton {
+                Layout.preferredHeight: 100
+                Layout.preferredWidth: 100
+                Layout.row: 1
+                id: heal
+                model: prof.heal
+                onClicked: {
+                    console.log(currentSkill.name)
+                }
+            }
+
             Repeater {
                 id: rep
-                model: prof.utilities
-                Button {
-                    id: skill
-                    icon.source: modelData.url
-                    icon.color: "transparent"
+                model: [7,8,9]
+                Layout.row: 1
 
+                SkillButton {
+                    Layout.preferredHeight: 100
+                    Layout.preferredWidth: 100
+                    id: skill
+                    model: prof.utilities
                     onClicked: {
-                        console.log(index, rep.model.length, modelData.description)
+                        console.log(currentSkill.name)
                     }
                 }
             }
+
+            SkillButton {
+                Layout.preferredHeight: 100
+                Layout.preferredWidth: 100
+                Layout.row: 1
+                Layout.column: 4
+                id: elite
+                model: prof.elite
+                onClicked: {
+                    console.log(currentSkill.name)
+                }
+            }
+
         }
     }
 }

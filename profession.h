@@ -14,6 +14,7 @@ struct Skill: private QJsonObject {
     QString slot() const;
     QString description() const;
     QString name() const;
+    QString category() const;
     int cooldown() const;
 
     Q_GADGET
@@ -22,6 +23,7 @@ struct Skill: private QJsonObject {
     Q_PROPERTY(QString slot READ slot)
     Q_PROPERTY(QString description READ description)
     Q_PROPERTY(QString name READ name)
+    Q_PROPERTY(QString category READ category)
     Q_PROPERTY(int cooldown READ cooldown)
 
 };
@@ -47,6 +49,7 @@ class Profession: public QObject,  public QJsonObject
     Q_PROPERTY(QVariantList utilities READ utilities NOTIFY skillsChanged)
     Q_PROPERTY(QVariantList heal READ heal NOTIFY skillsChanged)
     Q_PROPERTY(QVariantList elite READ elite NOTIFY skillsChanged)
+    Q_PROPERTY(QVariantList profession READ professionsSkill NOTIFY skillsChanged)
 
 private:
     QString m_name;
@@ -69,6 +72,7 @@ public:
     QVariantList utilities() const;
     QVariantList heal() const;
     QVariantList elite() const;
+    QVariantList professionsSkill() const;
 
 signals:
     void skillsChanged();

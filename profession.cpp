@@ -28,6 +28,14 @@ QString Skill::name() const
     return value("name").toString();
 }
 
+QString Skill::category() const
+{
+    QStringList ret;
+    for(auto it: value("categories").toArray()) {
+        ret<<it.toString();
+    }
+    return value("categories").toArray().isEmpty() ? "" : value("categories").toArray().first().toString();
+}
 
 int Skill::cooldown() const
 {
@@ -115,7 +123,7 @@ void Profession::receiveSkill(QJsonObject obj)
 {
     m_skills<<Skill(obj);
     auto& last = m_skills.last();
-    qDebug()<<m_skills.size()<<last.name()<<last.description()<<last.slot();
+    qDebug()<<m_skills.size()<<last.name()<<last.id()<<last.description()<<last.slot();
     emit skillsChanged();
 }
 
@@ -123,7 +131,7 @@ QVariantList Profession::skills(QString slot) const
 {
     QVariantList ret;
     for(auto it: m_skills) {
-        if(it.slot() == slot)
+        if(it.slot().contains(slot))
          ret<<QVariant::fromValue(it);
     }
     return ret;
@@ -143,4 +151,9 @@ QVariantList Profession::heal() const
 QVariantList Profession::elite() const
 {
     return skills("Elite");
+}
+
+QVariantList Profession::professionsSkill() const
+{
+    return skills("Profession");
 }
