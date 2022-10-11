@@ -6,19 +6,50 @@ import com.chewnonobelix.gw2 1.0
 
 Page {
     id: root
-    GridLayout {
-        anchors.fill: parent
-        SkillBar {
-            Layout.row: 0
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            id: bar
-            onSkillActivated: console.log(root.contentWidth, root.contentHeight)
+    GW2DataProvider {
+        id: network
+
+        Component.onCompleted: requestProfessions()
+    }
+
+    GW2Profession {
+        id: prof
+    }
+
+    Connections {
+        target: network
+
+        function onProfessionsEmited(pfs) {
+            classes.model = pfs
         }
-        TraitBar {
-            Layout.row: 1
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+    }
+
+    ScrollView {
+        Grid {
+            anchors.fill: parent
+            columns: 5
+            Label {
+                text: "Class"
+            }
+            ComboBox {
+                id: classes
+
+                onCurrentTextChanged: prof.setName(currentText)
+            }
+
+            Repeater {
+                id: rep
+                model: prof.utilities
+                Button {
+                    id: skill
+                    icon.source: modelData.url
+                    icon.color: "transparent"
+
+                    onClicked: {
+                        console.log(index, rep.model.length, modelData.description)
+                    }
+                }
+            }
         }
     }
 }

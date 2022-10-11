@@ -15,15 +15,16 @@ private:
 public:
     DataProvider();
     ~DataProvider() = default;
-    void request(QString);
+    void requestSkill(int);
+    Q_INVOKABLE void requestProfession(QString);
+    Q_INVOKABLE void requestProfessions();
 
 private:
     QNetworkAccessManager m_manager;
 
-    void onReadyState();
-
 signals:
-    void dataObjectReady(QJsonObject);
-    void dataArrayReady(QJsonArray);
+    void skillEmited(QJsonObject);
+    void professionEmited(QJsonObject);
+    void professionsEmited(QStringList);
 };
 

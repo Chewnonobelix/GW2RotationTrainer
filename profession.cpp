@@ -10,12 +10,12 @@ int Skill::id() const
 
 QUrl Skill::icon() const
 {
-    return value("icon").toString();
+    return QUrl(value("icon").toString());
 }
 
 QString Skill::slot() const
 {
-    return value("icon").toString();
+    return value("slot").toString();
 }
 
 QString Skill::description() const
@@ -40,9 +40,6 @@ int Skill::cooldown() const
 
 Weapon::Weapon(QJsonObject obj): QJsonObject(obj)
 {
-    QObject::connect(&dp, &DataProvider::dataObjectReady, [this](auto obj) {
-         skills<<Skill(obj);
-    });
 }
 
 int Weapon::id() const
@@ -52,7 +49,7 @@ int Weapon::id() const
 
 QUrl Weapon::icon() const
 {
-    return value("icon").toString();
+    return QUrl(value("icon").toString());
 }
 
 QString Weapon::name() const
@@ -69,12 +66,81 @@ QStringList Weapon::hand() const
 
 Profession::Profession()
 {
+    QObject::connect(&m_dp, &DataProvider::professionEmited, this, &Profession::receiveProfession);
+    QObject::connect(&m_dp, &DataProvider::skillEmited, this, &Profession::receiveSkill);
+}
 
+Profession::Profession(const Profession& p): QJsonObject(p)
+{
+    QObject::connect(&m_dp, &DataProvider::professionEmited, this, &Profession::receiveProfession);
+    QObject::connect(&m_dp, &DataProvider::skillEmited, this, &Profession::receiveSkill);
+}
+
+Profession::Profession(const QJsonObject& p): QJsonObject(p)
+{
+    QObject::connect(&m_dp, &DataProvider::professionEmited, this, &Profession::receiveProfession);
+    QObject::connect(&m_dp, &DataProvider::skillEmited, this, &Profession::receiveSkill);
 }
 
 void Profession::setName(QString name)
 {
     m_name = name;
+    m_skills.clear();
+    m_weapons.clear();
+    m_dp.requestProfession(name);
+}
 
-    m_dp.request(QString("https://api.guildwars2.com/v2/professions/%1").arg(name));
+Profession& Profession::operator= (const QJsonObject& obj)
+{
+    (QJsonObject&)(*this) = obj;
+
+    for(auto it: value("skills").toArray())
+        m_dp.requestSkill(it.toObject()["id"].toInt());
+
+    return *this;
+}
+
+Profession& Profession::operator= (const Profession& obj)
+{
+    (*this) = (QJsonObject)obj;
+
+    return *this;
+}
+void Profession::receiveProfession(QJsonObject obj)
+{
+    (*this) = obj;
+}
+
+void Profession::receiveSkill(QJsonObject obj)
+{
+    m_skills<<Skill(obj);
+    auto& last = m_skills.last();
+    qDebug()<<m_skills.size()<<last.name()<<last.description()<<last.slot();
+    emit skillsChanged();
+}
+
+QVariantList Profession::skills(QString slot) const
+{
+    QVariantList ret;
+    for(auto it: m_skills) {
+        if(it.slot() == slot)
+         ret<<QVariant::fromValue(it);
+    }
+    return ret;
+}
+
+
+QVariantList Profession::utilities() const
+{
+    return skills("Utility");
+}
+
+QVariantList Profession::heal() const
+{
+    return skills("Heal");
+}
+
+QVariantList Profession::elite() const
+{
+    return skills("Elite");
 }

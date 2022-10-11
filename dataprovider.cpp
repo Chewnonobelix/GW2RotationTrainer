@@ -4,21 +4,39 @@ DataProvider::DataProvider()
 {
 }
 
-void DataProvider::onReadyState()
+void DataProvider::requestSkill(int skillId)
 {
-    auto reply = dynamic_cast<QNetworkReply*>(sender());
-    reply->waitForReadyRead(5000);
-    auto data = reply->readAll();
-    auto doc = QJsonDocument::fromJson(data);
-
-    if(doc.isArray())
-        emit dataArrayReady(doc.array());
-    else
-        emit dataObjectReady(doc.object());
+    auto url = QString("https://api.guildwars2.com/v2/skills/%1").arg(skillId);
+    auto reply = m_manager.get(QNetworkRequest(QUrl(url)));
+    connect(reply, &QNetworkReply::finished, [reply, this]() {
+       auto data = reply->readAll();
+       auto doc = QJsonDocument::fromJson(data);
+       emit skillEmited(doc.object());
+    });
 }
 
-void DataProvider::request(QString req)
+void DataProvider::requestProfession(QString name)
 {
-    auto reply = m_manager.get(QNetworkRequest(QUrl(req)));
-    connect(reply, &QNetworkReply::finished, this, &DataProvider::onReadyState);
+    auto url = QString("https://api.guildwars2.com/v2/professions/%1").arg(name);
+    auto reply = m_manager.get(QNetworkRequest(QUrl(url)));
+    connect(reply, &QNetworkReply::finished, [reply, this]() {
+       auto data = reply->readAll();
+       auto doc = QJsonDocument::fromJson(data);
+       emit professionEmited(doc.object());
+
+    });
 }
+
+void DataProvider::requestProfessions()
+{
+    auto reply = m_manager.get(QNetworkRequest(QUrl("https://api.guildwars2.com/v2/professions")));
+    connect(reply, &QNetworkReply::finished, [reply, this]() {
+       auto data = reply->readAll();
+       auto doc = QJsonDocument::fromJson(data);
+       QStringList ret;
+       for(auto it: doc.array())
+           ret<<it.toString();
+       emit professionsEmited(ret);
+    });
+}
+
