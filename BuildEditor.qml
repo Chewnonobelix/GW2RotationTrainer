@@ -37,6 +37,22 @@ Page {
                 onCurrentTextChanged: prof.setName(currentText)
             }
 
+            Label {
+                text: "Weapons"
+            }
+
+            ComboBox {
+                id: mainHand1
+                model: prof.mainHand
+                textRole: "name"
+                valueRole: "twohanded"
+            }
+            ComboBox {
+                id: offHand1
+                model: prof.offHand
+                enabled: !mainHand1.currentValue
+            }
+
             SkillButton {
                 Layout.preferredHeight: 100
                 Layout.preferredWidth: 100
@@ -59,7 +75,7 @@ Page {
                     id: skill
                     model: prof.utilities
                     onClicked: {
-                        console.log(currentSkill.name)
+                        console.log(currentSkill.name, index, modelData)
                     }
                 }
             }
@@ -71,6 +87,7 @@ Page {
                 Layout.column: 4
                 id: elite
                 model: prof.elite
+                editable: true
                 onClicked: {
                     console.log(currentSkill.name)
                 }

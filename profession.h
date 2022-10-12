@@ -28,18 +28,26 @@ struct Skill: private QJsonObject {
 
 };
 
-class Weapon: private QJsonObject {
+class Weapon: public QJsonObject {
     QList<Skill> skills;
 
-    DataProvider dp;
-
 public:
-    Weapon(QJsonObject);
+    Weapon() = default;
+    Weapon(const Weapon&);
+    Weapon(const QJsonObject&);
     int id() const;
     QUrl icon() const;
     QString name() const;
     QStringList hand() const;
 
+    bool isAquatic() const;
+    bool isTwoHand() const;
+    bool isMainHand() const;
+    bool isOffHand() const;
+
+    void addSkill(QJsonObject);
+
+    Weapon& operator= (const Weapon&);
 };
 
 class Profession: public QObject,  public QJsonObject
@@ -50,10 +58,14 @@ class Profession: public QObject,  public QJsonObject
     Q_PROPERTY(QVariantList heal READ heal NOTIFY skillsChanged)
     Q_PROPERTY(QVariantList elite READ elite NOTIFY skillsChanged)
     Q_PROPERTY(QVariantList profession READ professionsSkill NOTIFY skillsChanged)
+    Q_PROPERTY(QStringList weapons READ weapons NOTIFY weaponsChanged)
+    Q_PROPERTY(QVariantList mainHand READ mainHand NOTIFY weaponsChanged)
+    Q_PROPERTY(QStringList offHand READ offHand NOTIFY weaponsChanged)
+    Q_PROPERTY(QStringList aquatic READ aquatic NOTIFY weaponsChanged)
 
 private:
     QString m_name;
-    QList<Weapon> m_weapons;
+    QMap<QString, Weapon> m_weapons;
     QList<Skill> m_skills;
     DataProvider m_dp;
 
@@ -73,9 +85,14 @@ public:
     QVariantList heal() const;
     QVariantList elite() const;
     QVariantList professionsSkill() const;
+    QStringList weapons() const;
+    QVariantList mainHand() const;
+    QStringList offHand() const;
+    QStringList aquatic() const;
 
 signals:
     void skillsChanged();
+    void weaponsChanged();
 
 private slots:
     void receiveProfession(QJsonObject);

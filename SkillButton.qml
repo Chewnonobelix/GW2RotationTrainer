@@ -44,7 +44,7 @@ Item {
 
         Button {
             id: skill
-            Layout.preferredHeight: root.height * (editable ? 0.8 : 1)
+            Layout.preferredHeight: root.height * 0.8
             Layout.preferredWidth: Layout.preferredHeight
             icon.source: currentSkill ? currentSkill.url : ""
             icon.color: "transparent"

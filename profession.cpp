@@ -41,13 +41,18 @@ int Skill::cooldown() const
 {
     auto facts = value("facts").toArray();
     auto it = std::find_if(facts.begin(), facts.end(), [](auto value) {
-       return value.toObject()["type"].toString() == "Recharge";
+        return value.toObject()["type"].toString() == "Recharge";
     });
     return it != facts.end() ? it->toObject()["value"].toInt() : 0;
 }
 
-Weapon::Weapon(QJsonObject obj): QJsonObject(obj)
+Weapon::Weapon(const QJsonObject &obj): QJsonObject(obj)
 {
+}
+
+Weapon::Weapon(const Weapon& wp): QJsonObject(wp)
+{
+    skills = wp.skills;
 }
 
 int Weapon::id() const
@@ -64,6 +69,7 @@ QString Weapon::name() const
 {
     return value("name").toString();
 }
+
 QStringList Weapon::hand() const
 {
     QStringList ret;
@@ -71,6 +77,26 @@ QStringList Weapon::hand() const
         ret<<it.toString();
     return ret;
 }
+
+void Weapon::addSkill(QJsonObject obj)
+{
+    skills<<Skill(obj);
+}
+
+Weapon& Weapon::operator= (const Weapon& wp)
+{
+    (QJsonObject&)(*this) = (QJsonObject&)(wp);
+    skills = wp.skills;
+
+    return *this;
+}
+
+bool Weapon::isAquatic() const {return hand().contains("Aquatic");}
+bool Weapon::isTwoHand() const {return hand().contains("TwoHand");}
+bool Weapon::isMainHand() const {return hand().contains("Mainhand");}
+bool Weapon::isOffHand() const {return hand().contains("Offhand");}
+
+
 
 Profession::Profession()
 {
@@ -117,14 +143,26 @@ Profession& Profession::operator= (const Profession& obj)
 void Profession::receiveProfession(QJsonObject obj)
 {
     (*this) = obj;
+    auto wps = value("weapons").toObject();
+    for(auto it: wps.keys()) {
+        m_weapons[it] = Weapon{wps[it].toObject()};
+
+        for(auto it2: wps[it].toObject()["skills"].toArray()) {
+            m_dp.requestSkill(it2.toObject()["id"].toInt());
+        }
+    }
+    emit weaponsChanged();
 }
 
 void Profession::receiveSkill(QJsonObject obj)
 {
-    m_skills<<Skill(obj);
-    auto& last = m_skills.last();
-    qDebug()<<m_skills.size()<<last.name()<<last.id()<<last.description()<<last.slot();
-    emit skillsChanged();
+    if(obj["type"] != "Weapon") {
+        m_skills<<Skill(obj);
+        emit skillsChanged();
+    }
+    else {
+        m_weapons[obj["weapon_type"].toString()].addSkill(obj);
+    }
 }
 
 QVariantList Profession::skills(QString slot) const
@@ -132,7 +170,7 @@ QVariantList Profession::skills(QString slot) const
     QVariantList ret;
     for(auto it: m_skills) {
         if(it.slot().contains(slot))
-         ret<<QVariant::fromValue(it);
+            ret<<QVariant::fromValue(it);
     }
     return ret;
 }
@@ -156,4 +194,42 @@ QVariantList Profession::elite() const
 QVariantList Profession::professionsSkill() const
 {
     return skills("Profession");
+}
+
+QStringList Profession::weapons() const
+{
+    return m_weapons.keys();
+}
+
+QVariantList Profession::mainHand() const
+{
+    QVariantList ret;
+    for(auto it: m_weapons) {
+        if(!it.isAquatic() && (it.isMainHand() || it.isTwoHand())) {
+            ret<<QVariantMap{{"twohanded", it.isTwoHand()}, {"name", m_weapons.key(it)}};
+        }
+    }
+    return ret;
+}
+
+QStringList Profession::offHand() const
+{
+    QStringList ret;
+    for(auto it: m_weapons) {
+        if(it.isOffHand()) {
+            ret<<m_weapons.key(it);
+        }
+    }
+    return ret;
+}
+
+QStringList Profession::aquatic() const
+{
+    QStringList ret;
+    for(auto it: m_weapons) {
+        if(it.isOffHand()) {
+            ret<<m_weapons.key(it);
+        }
+    }
+    return ret;
 }
