@@ -16,6 +16,15 @@ Page {
         id: prof
     }
 
+    GW2Build {
+        id: build
+
+        mainHand1: mainHand1.currentText
+        offHand1: offHand1.currentText
+        heal: heal.currentSkill ? heal.currentSkill.id : -1
+        elite: elite.currentSkill? elite.currentSkill.id : -1
+    }
+
     Connections {
         target: network
 
@@ -46,6 +55,17 @@ Page {
                 model: prof.mainHand
                 textRole: "name"
                 valueRole: "twohanded"
+
+                onCurrentValueChanged: function() {
+                    console.log(currentValue, currentText, offHand1.indexOfValue(currentText))
+                    if(currentValue) {
+                        offHand1.currentIndex = offHand1.indexOfValue(currentText)
+                        build.offHand1 = ""
+                    }
+                    else {
+                        offHand1.currentIndex = -1
+                    }
+                }
             }
             ComboBox {
                 id: offHand1
@@ -73,9 +93,13 @@ Page {
                     Layout.preferredHeight: 100
                     Layout.preferredWidth: 100
                     id: skill
+                    Component.onCompleted: console.log(objectName)
                     model: prof.utilities
+                    property string getter: 'utility'+(index+1)
+
+                    onCurrentSkillChanged: build[getter] = currentSkill.id
                     onClicked: {
-                        console.log(currentSkill.name, index, modelData)
+                        console.log(currentSkill.name, index, modelData, build[getter])
                     }
                 }
             }
@@ -90,6 +114,23 @@ Page {
                 editable: true
                 onClicked: {
                     console.log(currentSkill.name)
+                }
+            }
+
+            Repeater {
+                id: rep2
+                model: [1,2,3,4,5]
+                Layout.row: 2
+
+                SkillButton {
+                    Layout.preferredHeight: 100
+                    Layout.preferredWidth: 100
+                    id: skillWeapon
+                    editable: false
+
+                    onClicked: {
+                        console.log(currentSkill.name, index, modelData)
+                    }
                 }
             }
 

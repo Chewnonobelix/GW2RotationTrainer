@@ -97,6 +97,58 @@ bool Weapon::isMainHand() const {return hand().contains("Mainhand");}
 bool Weapon::isOffHand() const {return hand().contains("Offhand");}
 
 
+Skill  Weapon::weapon1() const
+{
+    auto it = std::find_if(skills.begin(), skills.end(), [](auto i) {
+        return i.slot() == "Weapon_1";
+    });
+
+    return *it;
+}
+Skill  Weapon::weapon2() const
+{
+    auto it = std::find_if(skills.begin(), skills.end(), [](auto i) {
+        return i.slot() == "Weapon_2";
+    });
+
+    return *it;
+}
+
+Skill  Weapon::weapon3() const
+{
+    auto it = std::find_if(skills.begin(), skills.end(), [](auto i) {
+        return i.slot() == "Weapon_3";
+    });
+
+    return *it;
+}
+
+Skill  Weapon::weapon4() const
+{
+    auto it = std::find_if(skills.begin(), skills.end(), [](auto i) {
+        return i.slot() == "Weapon_4";
+    });
+
+    return *it;
+}
+
+Skill  Weapon::weapon5() const
+{
+    auto it = std::find_if(skills.begin(), skills.end(), [](auto i) {
+        return i.slot() == "Weapon_5";
+    });
+
+    return *it;
+}
+
+Skill  Weapon::weaponX(int index) const
+{
+    auto it = std::find_if(skills.begin(), skills.end(), [index](auto i) {
+        return i.slot() == QString("Weapon_%1").arg(index);
+    });
+
+    return *it;
+}
 
 Profession::Profession()
 {
@@ -216,7 +268,7 @@ QStringList Profession::offHand() const
 {
     QStringList ret;
     for(auto it: m_weapons) {
-        if(it.isOffHand()) {
+        if(it.isOffHand() || (it.isTwoHand() && !it.isAquatic())) {
             ret<<m_weapons.key(it);
         }
     }

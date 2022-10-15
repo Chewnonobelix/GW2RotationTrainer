@@ -4,6 +4,7 @@
 #include "rotationhandler.h"
 #include "dataprovider.h"
 #include "profession.h"
+#include "build.h"
 
 //#include "buildeditor.h"
 
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<RotationHandler>("com.chewnonobelix.gw2", 1, 0, "GW2RotationHandler");
     qmlRegisterType<DataProvider>("com.chewnonobelix.gw2", 1, 0, "GW2DataProvider");
     qmlRegisterType<Profession>("com.chewnonobelix.gw2", 1, 0, "GW2Profession");
+    qmlRegisterType<Build>("com.chewnonobelix.gw2", 1, 0, "GW2Build");
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));

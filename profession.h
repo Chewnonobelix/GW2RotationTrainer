@@ -19,6 +19,7 @@ struct Skill: private QJsonObject {
 
     Q_GADGET
 
+    Q_PROPERTY(int id READ id)
     Q_PROPERTY(QUrl url READ icon)
     Q_PROPERTY(QString slot READ slot)
     Q_PROPERTY(QString description READ description)
@@ -31,6 +32,13 @@ struct Skill: private QJsonObject {
 class Weapon: public QJsonObject {
     QList<Skill> skills;
 
+    Q_GADGET
+    Q_PROPERTY(Skill weapon1 READ weapon1);
+    Q_PROPERTY(Skill weapon2 READ weapon2);
+    Q_PROPERTY(Skill weapon3 READ weapon3);
+    Q_PROPERTY(Skill weapon4 READ weapon4);
+    Q_PROPERTY(Skill weapon5 READ weapon5);
+
 public:
     Weapon() = default;
     Weapon(const Weapon&);
@@ -40,10 +48,17 @@ public:
     QString name() const;
     QStringList hand() const;
 
-    bool isAquatic() const;
-    bool isTwoHand() const;
-    bool isMainHand() const;
-    bool isOffHand() const;
+    Q_INVOKABLE bool isAquatic() const;
+    Q_INVOKABLE bool isTwoHand() const;
+    Q_INVOKABLE bool isMainHand() const;
+    Q_INVOKABLE bool isOffHand() const;
+
+    Skill weapon1() const;
+    Skill weapon2() const;
+    Skill weapon3() const;
+    Skill weapon4() const;
+    Skill weapon5() const;
+    Q_INVOKABLE Skill weaponX(int) const;
 
     void addSkill(QJsonObject);
 
