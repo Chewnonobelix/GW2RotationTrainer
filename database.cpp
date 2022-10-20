@@ -30,13 +30,15 @@ QJsonArray DataBase::mapping() const
 
 QJsonObject DataBase::build(int id) const
 {
-    auto buildQuery = m_db.exec(QString("SELECT name FROM builds WHERE id='%1'").arg(id));
+    auto buildQuery = m_db.exec(QString("SELECT name, class FROM builds WHERE id='%1'").arg(id));
 
     buildQuery.next();
     auto record = buildQuery.record();
     QJsonObject ret;
     ret["id"] = id;
     ret["name"] = record.value("name").toString();
+    ret["profession"] = record.value("profession").toString();
+
     auto rotationQuery = m_db.exec(QString("SELECT 'index', opening, role FROM rotation WHERE build='%1' ORDER BY opening, 'index'").arg(id));
     auto map = mapping();
 
@@ -57,7 +59,21 @@ QJsonObject DataBase::build(int id) const
 
     ret["opening"] = opening;
     ret["rotation"] = rotation;
+
+    auto skillQuery = m_db.exec(QString("SELECT skillId, role FROM skills WHERE build=%1").arg(id));
+
+    QJsonObject skills;
+    while(skillQuery.next()) {
+        auto record = skillQuery.record();
+        auto slot = record.value("role").toString();
+        auto skillId = record.value("skillId").toInt();
+        skills[slot] = skillId;
+    }
+
+    ret["skills"] = skills;
+
     return ret;
+
 }
 
 QJsonArray DataBase::builds() const
@@ -79,7 +95,6 @@ QJsonArray DataBase::builds() const
 void DataBase::addBuild(QJsonObject build)
 {
     long id ;
-    qDebug()<<build["profession"];
     if(build.contains("id")) {
         id = build["id"].toInt();
         auto query = m_db.exec(QString("UPDATE builds SET name = '%1', class = '%2' WHERE id = %3").arg(build["name"].toString()).arg(build["profession"].toString()).arg(id));
@@ -91,7 +106,7 @@ void DataBase::addBuild(QJsonObject build)
     }
     auto opening = build["opening"].toArray();
     auto rotation = build["rotation"].toArray();
-    qDebug()<<id;
+
     auto inserter = [id, this](QJsonArray array, bool isOpening) {
         for(auto i = 0; i < array.count(); i++) {
             auto queryRole = m_db.exec(QString("SELECT id FROM mapping WHERE role='%1'").arg(array[i].toObject()["role"].toString()));
@@ -106,6 +121,14 @@ void DataBase::addBuild(QJsonObject build)
 
     inserter(opening, true);
     inserter(rotation, false);
+
+    auto skills = build["skills"].toObject();
+    for(auto it: skills.keys()) {
+        auto skill = skills[it].toInt();
+        auto query = QString("INSERT OR REPLACE INTO skills (build, skillId, role) VALUES (%1, %2, '%3')").arg(id).arg(skill).arg(it);
+        auto skillQuery = m_db.exec(query);
+        qDebug()<<"Skill query"<<skillQuery.lastError();
+    }
 }
 
 DataBase& DataBase::instance()

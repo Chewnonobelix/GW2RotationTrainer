@@ -72,8 +72,11 @@ Page {
                 onClicked: build.save()
             }
 
-            Label{
+            TextField {
+                id: name
                 text: build.name
+
+                onTextEdited: build.name = text
             }
 
             Label {
@@ -191,6 +194,7 @@ Page {
                     }
 
                     onClicked: {
+                        console.log(currentSkill)
                     }
                 }
             }

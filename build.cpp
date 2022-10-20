@@ -191,11 +191,12 @@ void Build::save()
 
 void Build::load(int id)
 {
-    qDebug()<<"Load"<<id;
     auto json = m_db.build(id);
-    qDebug()<<json;
     (QJsonObject&)(*this) = json;
 
-    qDebug()<<(*this)["rotation"];
     emit nameChanged();
+    emit professionChanged();
+    emit healChanged();
+    emit utilityChanged();
+    emit eliteChanged();
 }
