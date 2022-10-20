@@ -14,15 +14,18 @@ class DataBase : public QObject
     Q_OBJECT
 
 public:
-    explicit DataBase(QObject* = nullptr);
 
     QJsonArray mapping() const;
     QJsonObject build(int) const;
     QJsonArray builds() const;
     void addBuild(QJsonObject);
 
+    static DataBase& instance();
 signals:
 private:
+    explicit DataBase(QObject* = nullptr);
+
     QSqlDatabase m_db;
+
 };
 

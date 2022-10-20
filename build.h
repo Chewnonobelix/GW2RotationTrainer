@@ -4,7 +4,7 @@
 #include <QMap>
 #include "database.h"
 
-class Build : public QObject
+class Build : public QObject, public QJsonObject
 {
     Q_OBJECT
 
@@ -13,21 +13,22 @@ class Build : public QObject
     Q_PROPERTY(QString offHand2 READ offHand2 WRITE   setOffHand2  NOTIFY  offHand2Changed )
     Q_PROPERTY(QString mainHand2 READ mainHand2 WRITE setMainHand2 NOTIFY mainHand2Changed)
     Q_PROPERTY(int heal READ heal WRITE           setHeal      NOTIFY      healChanged     )
-    Q_PROPERTY(int utility1 READ utility1 WRITE   setUtility1  NOTIFY  utility1Changed )
-    Q_PROPERTY(int utility2 READ utility2 WRITE   setUtility2  NOTIFY  utility2Changed )
-    Q_PROPERTY(int utility3 READ utility3 WRITE   setUtility3  NOTIFY  utility3Changed )
+    Q_PROPERTY(int utility1 READ utility1 WRITE   setUtility1  NOTIFY  utilityChanged )
+    Q_PROPERTY(int utility2 READ utility2 WRITE   setUtility2  NOTIFY  utilityChanged )
+    Q_PROPERTY(int utility3 READ utility3 WRITE   setUtility3  NOTIFY  utilityChanged )
     Q_PROPERTY(int elite READ elite WRITE         setElite     NOTIFY     eliteChanged    )
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged);
     Q_PROPERTY(QString profession READ profession WRITE setProfession NOTIFY professionChanged);
 
 private:
-    QMap<QString, int> m_build;
-    QMap<QString, QString> m_weapons;
-    QString m_name;
-    QString m_profession;
-    DataBase m_db;
+//    QMap<QString, int> m_build;
+//    QMap<QString, QString> m_weapons;
+//    QString m_name;
+//    QString m_profession;
+    DataBase& m_db;
 
     void swap(QString, QString);
+    void setSkill(QString, int, bool = false);
 public:
     explicit Build(QObject *parent = nullptr);
     ~Build() = default;
@@ -58,15 +59,16 @@ public:
     void setName(QString);
     void setProfession(QString);
 
+    Q_INVOKABLE void save();
+    Q_INVOKABLE void load(int);
+
 signals:
     void mainHand1Changed ();
     void offHand1Changed ();
     void offHand2Changed ();
     void mainHand2Changed ();
     void healChanged ();
-    void utility1Changed ();
-    void utility2Changed ();
-    void utility3Changed ();
+    void utilityChanged ();
     void eliteChanged ();
     void nameChanged();
     void professionChanged();

@@ -67,7 +67,7 @@ private:
     int m_currentOpening = 0;
     bool m_isOpening = false;
 
-    DataBase m_db;
+    DataBase& m_db;
     void setting();
 };
 

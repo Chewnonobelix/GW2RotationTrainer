@@ -35,6 +35,7 @@ QJsonObject DataBase::build(int id) const
     buildQuery.next();
     auto record = buildQuery.record();
     QJsonObject ret;
+    ret["id"] = id;
     ret["name"] = record.value("name").toString();
     auto rotationQuery = m_db.exec(QString("SELECT 'index', opening, role FROM rotation WHERE build='%1' ORDER BY opening, 'index'").arg(id));
     auto map = mapping();
@@ -77,22 +78,38 @@ QJsonArray DataBase::builds() const
 
 void DataBase::addBuild(QJsonObject build)
 {
-    auto query = m_db.exec(QString("INSERT INTO builds (name) VALUES('%1')").arg(build["name"].toString()));
-    auto id = query.lastInsertId();
-
+    long id ;
+    qDebug()<<build["profession"];
+    if(build.contains("id")) {
+        id = build["id"].toInt();
+        auto query = m_db.exec(QString("UPDATE builds SET name = '%1', class = '%2' WHERE id = %3").arg(build["name"].toString()).arg(build["profession"].toString()).arg(id));
+        qDebug()<<query.lastError();
+    }
+    else {
+        auto query = m_db.exec(QString("INSERT INTO builds (name) VALUES('%1')").arg(build["name"].toString()));
+        id = query.lastInsertId().toInt();
+    }
     auto opening = build["opening"].toArray();
     auto rotation = build["rotation"].toArray();
-
+    qDebug()<<id;
     auto inserter = [id, this](QJsonArray array, bool isOpening) {
         for(auto i = 0; i < array.count(); i++) {
             auto queryRole = m_db.exec(QString("SELECT id FROM mapping WHERE role='%1'").arg(array[i].toObject()["role"].toString()));
             queryRole.next();
             auto role = queryRole.record().value("id").toInt();
-            auto queryRot = m_db.exec(QString("INSERT INTO rotation (build, role, opening, 'index') VALUES ('%1', '%2', '%3', '%4')")
-                                      .arg(id.toInt()).arg(role).arg(isOpening).arg(i));
+            auto queryRot = m_db.exec(QString("INSERT OR REPLACE INTO rotation (build, role, opening, 'index') VALUES ('%1', '%2', '%3', '%4')")
+                                      .arg(id).arg(role).arg(isOpening).arg(i));
+
+            qDebug()<<queryRot.lastError();
         }
     };
 
     inserter(opening, true);
     inserter(rotation, false);
+}
+
+DataBase& DataBase::instance()
+{
+    static DataBase db;
+    return db;
 }

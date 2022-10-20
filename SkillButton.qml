@@ -11,6 +11,12 @@ Item {
     property var model
     property bool editable: true
     signal clicked()
+
+
+    function reset(skill) {
+        skills.reset(skill)
+    }
+
     Popup {
         id: popup
         background: Rectangle {

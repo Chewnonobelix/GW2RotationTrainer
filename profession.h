@@ -75,7 +75,7 @@ class Profession: public QObject,  public QJsonObject
     Q_PROPERTY(QVariantList profession READ professionsSkill NOTIFY skillsChanged)
     Q_PROPERTY(QStringList weapons READ weapons NOTIFY weaponsChanged)
     Q_PROPERTY(QVariantList mainHand READ mainHand NOTIFY weaponsChanged)
-    Q_PROPERTY(QStringList offHand READ offHand NOTIFY weaponsChanged)
+    Q_PROPERTY(QVariantList offHand READ offHand NOTIFY weaponsChanged)
     Q_PROPERTY(QStringList aquatic READ aquatic NOTIFY weaponsChanged)
 
 private:
@@ -102,7 +102,7 @@ public:
     QVariantList professionsSkill() const;
     QStringList weapons() const;
     QVariantList mainHand() const;
-    QStringList offHand() const;
+    QVariantList offHand() const;
     QStringList aquatic() const;
 
 signals:

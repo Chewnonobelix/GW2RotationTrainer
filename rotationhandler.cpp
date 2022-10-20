@@ -6,7 +6,7 @@
 
 
 RotationHandler::RotationHandler(QObject *parent)
-    : QObject{parent}
+    : QObject{parent}, m_db(DataBase::instance())
 {
     m_mapping = m_db.mapping();
 }
@@ -159,5 +159,6 @@ void RotationHandler::append(QString key, QJsonObject map)
 
 QJsonArray RotationHandler::buildsList() const
 {
+    qDebug()<<m_db.builds();
     return m_db.builds();
 }

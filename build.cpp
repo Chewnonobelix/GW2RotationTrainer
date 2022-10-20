@@ -1,180 +1,201 @@
 #include "build.h"
 
 Build::Build(QObject *parent)
-    : QObject{parent}
+    : QObject{parent}, m_db(DataBase::instance())
 {
-
+    (*this)["utility1"] = -1;
+    (*this)["utility2"] = -1;
+    (*this)["utility3"] = -1;
 }
 
 int Build::id () const
 {
-    return m_build["id"];
+    return (*this)["id"].toInt();
 }
 
 QString Build::mainHand1 () const
 {
-    return m_weapons["mainHand1"];
+    return (*this)["weapons"].toObject()["mainHand1"].toString();
 }
 
 QString Build::offHand1 () const
 {
-    return m_weapons["offHand1"];
+    return (*this)["weapons"].toObject()["offHand1"].toString();
 }
 
 QString Build::offHand2 () const
 {
-    return m_weapons["offHand2"];
+    return (*this)["weapons"].toObject()["offHand2"].toString();
 }
 
 QString Build::mainHand2 () const
 {
-    return m_weapons["mainHand2"];
+    return (*this)["weapons"].toObject()["mainHand2"].toString();
 }
 
 int Build::heal () const
 {
-    return m_build["heal"];
+    return (*this)["skills"].toObject()["heal"].toInt();
 }
 
 int Build::utility1 () const
 {
-    return m_build["utility1"];
+    return (*this)["skills"].toObject()["utility1"].toInt();
 }
 
 int Build::utility2 () const
 {
-    return m_build["utility2"];
+    return (*this)["skills"].toObject()["utility2"].toInt();
 }
 
 int Build::utility3 () const
 {
-    return m_build["utility3"];
+    return (*this)["skills"].toObject()["utility3"].toInt();
 }
 
 int Build::elite () const
 {
-    return m_build["elite"];
+    return (*this)["skills"].toObject()["elite"].toInt();
 }
 
 QString Build::name() const
 {
-    return m_name;
+    return (*this)["name"].toString();
 }
 
 QString Build::profession() const
 {
-    return m_profession;
+    return (*this)["profession"].toString();
 }
 
 void Build::setId (int id)
 {
-    m_build["id"] = id;
+    (*this)["id"] = id;
 }
 
 void Build::setMainHand1 (QString id)
 {
-    m_weapons["mainHand1"] = id;
+    auto weapons = (*this)["weapons"].toObject();
+    weapons["mainHand1"] = id;
+    (*this)["weapons"] = weapons;
+
     emit mainHand1Changed();
-    qDebug()<<m_weapons<<m_build;
 }
 
 void Build::setOffHand1 (QString id)
 {
-    m_weapons["offHand1"] = id;
+    auto weapons = (*this)["weapons"].toObject();
+    qDebug()<<weapons;
+    weapons["offHand1"] = id;
+    (*this)["weapons"] = weapons;
+    qDebug()<<weapons;
     emit offHand1Changed();
-    qDebug()<<m_weapons<<m_build;
 }
 
 void Build::setOffHand2 (QString id)
 {
-    m_weapons["offHand2"] = id;
+    auto weapons = (*this)["weapons"].toObject();
+    weapons["offHand2"] = id;
+    (*this)["weapons"] = weapons;
+
     emit offHand2Changed();
-    qDebug()<<m_weapons<<m_build;
 }
 
 void Build::setMainHand2 (QString id)
 {
-    m_weapons["mainHand2"] = id;
+    auto weapons = (*this)["weapons"].toObject();
+    weapons["mainHand2"] = id;
+    (*this)["weapons"] = weapons;
+
     emit mainHand2Changed();
-    qDebug()<<m_weapons<<m_build;
+}
+
+void Build::setSkill(QString name, int id, bool swapable)
+{
+    auto skills = (*this)["skills"].toObject();
+
+    auto other = swapable ? std::find_if(skills.begin(), skills.end(), [id](auto it) {
+        return id != -1 && it.toInt() == id ;
+    }): skills.end();
+
+    if(!swapable || other == skills.end()) {
+        skills[name] = id;
+        (*this)["skills"] = skills;
+
+        emit utilityChanged();
+    }
+    else {
+        swap(other.key(), name);
+    }
 }
 
 void Build::setHeal (int id)
 {
-    m_build["heal"] = id;
+    setSkill("heal", id);
+
     emit healChanged();
-    qDebug()<<m_weapons<<m_build;
 }
 
 void Build::setUtility1 (int id)
 {
-    auto other = m_build.key(id);
-
-    if(other.isEmpty()) {
-        m_build["utility1"] = id;
-        emit utility3Changed();
-    }
-    else {
-        swap(other, "utility1");
-    }
-    qDebug()<<m_weapons<<m_build;
+    setSkill("utility1", id, true);
+    emit utilityChanged();
 }
 
 void Build::setUtility2 (int id)
 {
-    auto other = m_build.key(id);
-
-    if(other.isEmpty()) {
-        m_build["utility2"] = id;
-        emit utility3Changed();
-    }
-    else {
-        swap(other, "utility2");
-    }
-    qDebug()<<m_weapons<<m_build;
+    setSkill("utility2", id, true);
+    emit utilityChanged();
 }
 
 void Build::setUtility3 (int id)
 {
-    auto other = m_build.key(id);
-
-    if(other.isEmpty()) {
-        m_build["utility3"] = id;
-        emit utility3Changed();
-    }
-    else {
-        swap(other, "utility3");
-    }
-
-    qDebug()<<m_weapons<<m_build;
+    setSkill("utility3", id, true);
+    emit utilityChanged();
 }
 
 void Build::setElite (int id)
 {
-    m_build["elite"] = id;
+    setSkill("elite", id);
+
     emit eliteChanged();
-    qDebug()<<m_weapons<<m_build;
 }
 
 void Build::setName(QString name)
 {
-    m_name = name;
+    (*this)["name"] = name;
     emit nameChanged();
 }
 
 void Build::setProfession(QString profession)
 {
-    m_profession = profession;
+    (*this)["profession"] = profession;
     emit professionChanged();
 }
 
 void Build::swap(QString v1, QString v2)
 {
-    auto temp = m_build[v1];
-    m_build[v1] = m_build[v2];
-    m_build[v2] = temp;
 
-    emit utility1Changed();
-    emit utility2Changed();
-    emit utility3Changed();
+    auto skills = (*this)["skills"].toObject();
+
+    auto temp = skills[v1].toInt();
+    skills[v1] = skills[v2];
+    skills[v2] = temp;
+    (*this)["skills"] = skills;
+}
+
+void Build::save()
+{
+    m_db.addBuild(*this);
+}
+
+void Build::load(int id)
+{
+    qDebug()<<"Load"<<id;
+    auto json = m_db.build(id);
+    qDebug()<<json;
+    (QJsonObject&)(*this) = json;
+
+    qDebug()<<(*this)["rotation"];
+    emit nameChanged();
 }

@@ -264,12 +264,12 @@ QVariantList Profession::mainHand() const
     return ret;
 }
 
-QStringList Profession::offHand() const
+QVariantList Profession::offHand() const
 {
-    QStringList ret;
+    QVariantList ret;
     for(auto it: m_weapons) {
         if(it.isOffHand() || (it.isTwoHand() && !it.isAquatic())) {
-            ret<<m_weapons.key(it);
+            ret<<QVariantMap{{"twohanded", it.isTwoHand()}, {"name", m_weapons.key(it)}};
         }
     }
     return ret;

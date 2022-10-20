@@ -9,6 +9,10 @@ Item {
     property var model
     property var currentItem
 
+    function reset(skill) {
+        currentItem = skill
+    }
+
     GridLayout {
         anchors.fill: parent
         columns: 4
