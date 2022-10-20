@@ -126,6 +126,7 @@ Page {
         onClicked:saver.open()
     }
 
+
     Switch {
         id: switcher
         text: checked ? "opening" : "rotation"
@@ -134,12 +135,40 @@ Page {
         }
     }
 
+    Button{
+        id: loader
+        text: "Load"
+        anchors {
+            top: save.bottom
+        }
+
+        onClicked: {
+            rep.model = handler.buildsList()
+            menuLoader.open()
+        }
+    }
+
+    Menu {
+        id: menuLoader
+        x: loader.x + loader.width
+
+        Repeater {
+            id: rep
+
+            MenuItem {
+                text: modelData.name
+
+                onClicked: handler.load(modelData.id)
+            }
+        }
+    }
+
     Button {
         id: clear
         text: "Clear"
         onClicked: handler.rotation = {"opening": [], "rotation": []}
         anchors {
-            top: save.bottom
+            top: loader.bottom
         }
     }
 }

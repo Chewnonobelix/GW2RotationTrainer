@@ -98,7 +98,7 @@ void DataBase::addBuild(QJsonObject build)
     if(build.contains("id")) {
         id = build["id"].toInt();
         auto query = m_db.exec(QString("UPDATE builds SET name = '%1', class = '%2' WHERE id = %3").arg(build["name"].toString()).arg(build["profession"].toString()).arg(id));
-        qDebug()<<query.lastError();
+        qDebug()<<"update"<<query.lastError();
     }
     else {
         auto query = m_db.exec(QString("INSERT INTO builds (name) VALUES('%1')").arg(build["name"].toString()));
@@ -107,15 +107,19 @@ void DataBase::addBuild(QJsonObject build)
     auto opening = build["opening"].toArray();
     auto rotation = build["rotation"].toArray();
 
+    auto index = m_db.exec("SELECT * FROM sqlite_master");
+
     auto inserter = [id, this](QJsonArray array, bool isOpening) {
         for(auto i = 0; i < array.count(); i++) {
             auto queryRole = m_db.exec(QString("SELECT id FROM mapping WHERE role='%1'").arg(array[i].toObject()["role"].toString()));
             queryRole.next();
             auto role = queryRole.record().value("id").toInt();
-            auto queryRot = m_db.exec(QString("INSERT OR REPLACE INTO rotation (build, role, opening, 'index') VALUES ('%1', '%2', '%3', '%4')")
-                                      .arg(id).arg(role).arg(isOpening).arg(i));
+            auto queryRot = m_db.exec(QString("INSERT INTO rotation (build, opening, 'index', role) VALUES (%1, %2, %3, %4) "
+                                              "ON CONFLICT "
+                                              "DO UPDATE SET role=excluded.role")
+                                      .arg(id).arg(isOpening).arg(i).arg(role));
 
-            qDebug()<<queryRot.lastError();
+            qDebug()<<"Query rot"<<queryRot.executedQuery()<<queryRot.lastError();
         }
     };
 
@@ -125,7 +129,9 @@ void DataBase::addBuild(QJsonObject build)
     auto skills = build["skills"].toObject();
     for(auto it: skills.keys()) {
         auto skill = skills[it].toInt();
-        auto query = QString("INSERT OR REPLACE INTO skills (build, skillId, role) VALUES (%1, %2, '%3')").arg(id).arg(skill).arg(it);
+        auto query = QString("INSERT INTO skills (build, skillId, role) VALUES (%1, %2, '%3') "
+                             "ON CONFLICT (build, role) "
+                             "DO UPDATE SET skillId=excluded.skillId").arg(id).arg(skill).arg(it);
         auto skillQuery = m_db.exec(query);
         qDebug()<<"Skill query"<<skillQuery.lastError();
     }

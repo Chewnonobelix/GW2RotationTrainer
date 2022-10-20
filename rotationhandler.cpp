@@ -147,7 +147,8 @@ void RotationHandler::setting()
 
 void RotationHandler::setRotation(QJsonObject rot)
 {
-    m_rotation = rot;
+    m_rotation["opening"] = rot["opening"];
+    m_rotation["rotation"] = rot["rotation"];
 }
 
 void RotationHandler::append(QString key, QJsonObject map)
